@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Credentials / local configuration
+secrets.h
+secrets.py
+config.local.json
+*credentials*
+*secret*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local datasets and exports (commit only reviewed, non-sensitive experimental data)
+data/experimental/*
+!data/experimental/.gitkeep
