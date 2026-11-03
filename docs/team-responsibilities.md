@@ -1,74 +1,38 @@
-# Team Responsibilities
+# Equal Four-Way Project Responsibility Allocation
 
-This document records **two separate views** of project responsibility. Keep them distinct.
+**Project:** IoT-Analytics for Structural Vibration, Deformation and Load Behaviour Monitoring
 
-# A. Internal execution split
+The complete project is allocated equally among the four team members. Each member is assigned **25% of the overall project scope**. The allocation spans all five IoT stages—Sense, Ingest, Process, Store and Analyze—plus validation and documentation. It is not a hardware-versus-software division.
 
-This is the practical day-to-day arrangement used by the team to work in parallel and finish the prototype efficiently. GitHub implementation folders and handoffs follow this split.
+## Project-wide allocation matrix
 
-## Pranav Shashikiran Atreya (PES2UG24CS912)
-**Circuit design, electronics and embedded integration**
-- Own the circuit design and ESP32 pin allocation.
-- Interface all four sensing channels with the ESP32.
-- Develop and integrate the sensor-acquisition firmware.
-- Handle sensor calibration, serial debugging and embedded-side processing.
-- Configure the ESP32 network connection and integrate MQTT publishing with the cloud service.
-- Coordinate end-to-end integration and system testing.
-
-## Yash Raghavendra A (PES2UG24CS913)
-**Mechanical design and physical prototype**
-- Design and build the tabletop bridge/beam test structure.
-- Fabricate the base, deck, supports and mounting arrangements.
-- Mechanically mount the load cell and position the ToF/IR components.
-- Ensure stability, alignment and repeatability of physical tests.
-- Assist with calibration fixtures, controlled loading and vehicle-crossing experiments.
-
-## Hemaksh Breja (PES2UG24CS191)
-**IoT connectivity and cloud integration**
-- Configure the ThingSpeak channel and field definitions.
-- Set up MQTT device credentials and the publishing/ingestion path.
-- Validate cloud reception using clearly labelled sample values before hardware is ready.
-- Configure channel visualizations and data export/retrieval.
-- Document network, protocol and cloud configuration.
-- Integrate with actual ESP32 messages when available.
-
-## Kashyap V P (PES2UG24CS218)
-**Data analytics and machine learning**
-- Set up the Python environment and requirements.
-- Develop data cleaning, preprocessing and derived-feature calculations.
-- Build analytical plots and comparisons for loading and vehicle-crossing trials.
-- Implement a small, interpretable supervised classifier for experimentally defined response conditions.
-- Evaluate with a confusion matrix and held-out trials; document limitations.
-- Replace synthetic development data with actual experimental data for final results.
-
-# B. Separate equal four-way project-wide allocation
-
-This is a distinct project-wide allocation view. It is **not** the internal pair-based execution workflow above. The overall project is divided into four equal work packages, each covering contributions across the full IoT lifecycle rather than dividing the project into hardware and software teams.
-
-For planning purposes, the project is allocated as **100 contribution units: 25 units per member**. Each member has responsibilities in sensing, ingestion, processing, storage, analysis and validation/documentation.
-
-| Project stage | Pranav — 25 units | Yash — 25 units | Hemaksh — 25 units | Kashyap — 25 units |
+| IoT stage / activity | Pranav Shashikiran Atreya (PES2UG24CS912) | Yash Raghavendra A (PES2UG24CS913) | Hemaksh Breja (PES2UG24CS191) | Kashyap V P (PES2UG24CS218) |
 |---|---|---|---|---|
-| **Sense** | Vibration measurement requirements, MPU6050 sampling and calibration plan | Structural test setup, sensor placement and load/deflection measurement method | Vehicle-count event definition and IR detection validation criteria | Measurement variables, experiment labels and dataset capture requirements |
-| **Ingest** | ESP32 acquisition sequence, timestamps and common data-packet structure | Repeatable physical test/event procedure and run identification | MQTT publish/subscribe configuration and cloud ingestion | Incoming-data validation, timestamp checks and CSV/schema consistency |
-| **Process** | Acceleration baseline treatment, vibration RMS and peak calculation | Load-cell calibration conversion and ToF baseline-to-deflection calculation | MQTT payload decoding, field mapping and missing/invalid update checks | Data cleaning, feature preparation and experiment-label preparation |
-| **Store** | Define measurement units, field names and calibration metadata requirements | Maintain test-run metadata: applied mass, placement and experimental condition | ThingSpeak channel configuration and cloud time-series storage | Organize exported datasets and maintain sample-versus-experimental data separation |
-| **Analyze** | Vibration response trends and comparison across experimental conditions | Load-versus-deflection and support-reaction analysis | Vehicle-count/time trends and comparison with measured structural response | Analytics visualizations and simple supervised ML classification/evaluation |
-| **Validate & document** | Validate vibration readings and document embedded acquisition | Repeat static-load/vehicle-crossing trials and document the physical method | Validate end-to-end MQTT/cloud receipt and document protocol configuration | Validate analytical outputs/model evaluation and document findings and limitations |
+| **Sense** | Define vibration measurement requirements; characterize MPU6050 readings and sampling | Define structural measurement setup; plan load and deflection measurements and sensor placement | Define vehicle-crossing event criteria and IR count validation procedure | Define measurement variables, trial labels and data-capture requirements |
+| **Ingest** | Define ESP32 acquisition sequence, timestamping and sensor data packet | Define repeatable test-run procedure, event timing and experimental run identifiers | Configure MQTT publishing/receiving and cloud-ingestion workflow | Validate incoming data structure, timestamps and dataset consistency |
+| **Process** | Process acceleration readings; calculate vibration RMS and peak | Calibrate load-cell readings and convert ToF baseline change to deflection | Decode MQTT payloads, map channel fields and check missing/invalid updates | Clean data, prepare features and organize experimental labels |
+| **Store** | Define measurement units, field names and calibration metadata | Maintain experimental metadata including applied mass, placement and test condition | Configure ThingSpeak fields and cloud time-series storage | Organize exported datasets and maintain separation of sample and experimental data |
+| **Analyze** | Analyze vibration trends and compare response across test conditions | Analyze load-versus-deflection and support-reaction behaviour | Analyze vehicle-count/time trends and relate crossings to structural measurements | Produce analytical visualizations and implement/evaluate the simple ML classifier |
+| **Validate & document** | Validate vibration measurements and document acquisition methodology | Conduct repeatable physical trials and document mechanical setup and calibration | Verify end-to-end MQTT/cloud receipt and document communication workflow | Validate analytical outputs, report model evaluation and document findings/limitations |
 
-**Equal-allocation summary**
+## Equal allocation summary
 
-- Pranav Shashikiran Atreya — 25%
-- Yash Raghavendra A — 25%
-- Hemaksh Breja — 25%
-- Kashyap V P — 25%
+| Team member | Allocated share |
+|---|---:|
+| Pranav Shashikiran Atreya | 25% |
+| Yash Raghavendra A | 25% |
+| Hemaksh Breja | 25% |
+| Kashyap V P | 25% |
+| **Total** | **100%** |
 
-The equal allocation is a project-wide responsibility matrix. It is separate from the practical pair-based execution split in Section A. Each member should be familiar with the overall pipeline and be able to explain their allocated project-wide tasks during review.
+Each allocation spans the full project lifecycle. Team members should understand the common architecture and be prepared to explain their assigned activities during the review.
 
-# Collaboration and handoffs
+## Common project deliverables
 
-- All four members coordinate around one agreed data schema and experimental protocol.
-- Sample/synthetic records are for software development only and must not be presented as physical experimental results.
-- Keep implementation commits in the appropriate repository folders.
-- Record actual tests, calibration factors and results as work is completed.
-- Never commit Wi-Fi passwords, ThingSpeak API keys, MQTT usernames or passwords.
+All members coordinate on:
+- The shared Sense → Ingest → Process → Store → Analyze pipeline.
+- One agreed sensor-data schema and experiment protocol.
+- Verification using actual prototype measurements.
+- Final results, limitations and project documentation.
+
+Synthetic/sample data may be used for development and testing, but must be clearly identified and must not be presented as physical experimental results.
