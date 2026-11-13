@@ -1,18 +1,29 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
+.pytest_cache/
 .venv/
 venv/
+env/
+
+# Environment & Local Secrets (NEVER COMMIT)
 .env
 .env.*
 !.env.example
-
-# Credentials / local configuration
 secrets.h
+firmware/**/secrets.h
 secrets.py
 config.local.json
 *credentials*
 *secret*
+!secrets.example.h
+!firmware/**/secrets.example.h
+
+# Docker local runtime state
+docker/mosquitto/data/
+docker/mosquitto/log/
+docker/mosquitto/passwd
 
 # IDE / OS
 .vscode/
@@ -20,6 +31,11 @@ config.local.json
 .DS_Store
 Thumbs.db
 
-# Local datasets and exports (commit only reviewed, non-sensitive experimental data)
-data/experimental/*
-!data/experimental/.gitkeep
+# Local datasets and build outputs
+# Keep README.md and .gitkeep in data/experimental; ignore unreviewed raw captures if desired
+data/experimental/*.tmp
+analytics-ml/results/*.tmp
+build/
+*.bin
+*.elf
+*.map

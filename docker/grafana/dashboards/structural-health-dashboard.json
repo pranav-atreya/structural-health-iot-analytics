@@ -1,0 +1,591 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "1. Sensor Connectivity, Hardware Diagnostics & Latest Telemetry",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Latest telemetry sequence number, ESP32 uptime, and IMU WHO_AM_I register identity (0x68 = 104 dec for MPU-6050, 0x70 = 112 dec for MPU-6500).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "noValue": "Awaiting Telemetry",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "uptime_ms" },
+            "properties": [{ "id": "unit", "value": "ms" }, { "id": "displayName", "value": "ESP32 Uptime" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "seq" },
+            "properties": [{ "id": "displayName", "value": "Packet Seq #" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "imu_who_am_i" },
+            "properties": [
+              { "id": "displayName", "value": "IMU WHO_AM_I" },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "104": { "color": "green", "index": 0, "text": "0x68 (MPU-6050)" },
+                      "112": { "color": "green", "index": 1, "text": "0x70 (MPU-6500)" }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "hx711_calibrated_int" },
+            "properties": [
+              { "id": "displayName", "value": "Load Cell Calibration" },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": { "color": "orange", "index": 0, "text": "UNCALIBRATED (Counts Only)" },
+                      "1": { "color": "green", "index": 1, "text": "CALIBRATED (Grams Active)" }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 1 },
+      "id": 10,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"seq\" or r[\"_field\"] == \"uptime_ms\" or r[\"_field\"] == \"imu_who_am_i\" or r[\"_field\"] == \"hx711_calibrated_int\")\n  |> last()\n  |> keep(columns: [\"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "10. Sensor Connectivity & Hardware Identity Status",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Live dynamic vibration RMS (g) computed on the ESP32 at ~100 Hz after low-pass gravity removal.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 4,
+          "max": 0.5,
+          "min": 0,
+          "noValue": "No IMU Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.04 },
+              { "color": "red", "value": 0.12 }
+            ]
+          },
+          "unit": "accG"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "id": 1,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\" and r[\"_field\"] == \"vibration_rms_g\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "1. Live Vibration RMS (g)",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Peak dynamic vibration magnitude (g) recorded within the 1-second reporting window.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 4,
+          "max": 1.0,
+          "min": 0,
+          "noValue": "No IMU Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.08 },
+              { "color": "red", "value": 0.25 }
+            ]
+          },
+          "unit": "accG"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "id": 2,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\" and r[\"_field\"] == \"vibration_peak_g\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "2. Live Peak Vibration (g)",
+      "type": "gauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "panels": [],
+      "title": "2. Structural Vibration & 6-Axis IMU Dynamics (100 Hz Sampling)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Time-series history of dynamic vibration RMS (g) and peak vibration (g) across baseline, static loading, and vehicle crossings.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisLabel": "Dynamic Vibration (g)",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "auto",
+            "spanNulls": true
+          },
+          "decimals": 4,
+          "unit": "accG"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 6 },
+      "id": 11,
+      "options": {
+        "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"vibration_rms_g\" or r[\"_field\"] == \"vibration_peak_g\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Vibration RMS & Peak Trend (g)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "3-axis accelerometer readings (ax_g, ay_g, az_g) converted from +/-4g full-scale raw registers (8192 LSB/g).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisLabel": "Acceleration (g)",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "decimals": 3,
+          "unit": "accG"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 6 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": ["mean", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"ax_g\" or r[\"_field\"] == \"ay_g\" or r[\"_field\"] == \"az_g\")",
+          "refId": "A"
+        }
+      ],
+      "title": "3. Accelerometer Measurements (ax_g, ay_g, az_g)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "3-axis gyroscope angular rate readings (gx_dps, gy_dps, gz_dps) converted from +/-500 dps full-scale registers (65.5 LSB/dps).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisLabel": "Angular Velocity (deg/s)",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "decimals": 2,
+          "unit": "degrees/sec"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 6 },
+      "id": 4,
+      "options": {
+        "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"gx_dps\" or r[\"_field\"] == \"gy_dps\" or r[\"_field\"] == \"gz_dps\")",
+          "refId": "A"
+        }
+      ],
+      "title": "4. Gyroscope Measurements (gx_dps, gy_dps, gz_dps)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "id": 102,
+      "panels": [],
+      "title": "3. Instrumented Support Reaction — Sharvi 1 kg Bar Load Cell & HX711",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Tare-relative net counts (hx711_net_counts) and EMA-filtered counts (hx711_filtered_counts) from the HX711 amplifier at the instrumented support.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisLabel": "HX711 ADC Counts (Tare-Relative)",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": true
+          },
+          "decimals": 1,
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 11, "x": 0, "y": 14 },
+      "id": 5,
+      "options": {
+        "legend": { "calcs": ["min", "mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"hx711_net_counts\" or r[\"_field\"] == \"hx711_filtered_counts\")",
+          "refId": "A"
+        }
+      ],
+      "title": "5a. HX711 Net & Filtered Counts (Tare-Relative Support Response)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Raw 24-bit signed ADC counts directly from the HX711 before tare offset subtraction.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 0,
+          "noValue": "No HX711 Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "purple", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "hx711_raw_counts" },
+            "properties": [{ "id": "displayName", "value": "Raw Counts" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "hx711_net_counts" },
+            "properties": [{ "id": "displayName", "value": "Tare-Relative Net Counts" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "hx711_filtered_counts" },
+            "properties": [{ "id": "displayName", "value": "Filtered Counts (EMA)" }, { "id": "decimals", "value": 2 }]
+          }
+        ]
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 11, "y": 14 },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"hx711_raw_counts\" or r[\"_field\"] == \"hx711_net_counts\" or r[\"_field\"] == \"hx711_filtered_counts\")\n  |> last()\n  |> keep(columns: [\"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "5b. HX711 Raw / Net / Filtered Snapshot",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Reaction force in grams at the single instrumented bridge support. Reported ONLY when calibrated with a known reference mass; displays 'Uncalibrated (Raw Counts Active)' when load_grams is null.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 2,
+          "noValue": "Uncalibrated (Raw Counts Active)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 5 },
+              { "color": "orange", "value": 250 },
+              { "color": "red", "value": 750 }
+            ]
+          },
+          "unit": "massg"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 7, "x": 17, "y": 14 },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\" and r[\"_field\"] == \"load_grams\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "6. Calibrated Support Reaction (g at Instrumented Support)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+      "id": 103,
+      "panels": [],
+      "title": "4. Dual IR Obstacle Sensors & Vehicle Crossing State Machine",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "IR Sensor 1 (GPIO 26) and IR Sensor 2 (GPIO 27) digital states and cumulative obstacle event transitions.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisLabel": "Events / State",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": true
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 10, "x": 0, "y": 22 },
+      "id": 7,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"ir1_state\" or r[\"_field\"] == \"ir2_state\" or r[\"_field\"] == \"ir1_events\" or r[\"_field\"] == \"ir2_events\")",
+          "refId": "A"
+        }
+      ],
+      "title": "7. IR Sensor 1 (GPIO 26) & Sensor 2 (GPIO 27) States and Events",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Debounced, state-machine validated cumulative vehicle crossings across the bridge deck.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 10, "y": 22 },
+      "id": 8,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\" and r[\"_field\"] == \"vehicle_count\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "8. Cumulative Vehicle Crossing Count",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+      "description": "Crossing direction (1_to_2 or 2_to_1), transit time between IR1 and IR2 (ms), and estimated speed (m/s, available only when physical sensor spacing > 0.0 m is configured).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "noValue": "Spacing Not Configured (0.0 m)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "teal", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "last_direction_str" },
+            "properties": [{ "id": "displayName", "value": "Last Crossing Direction" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_crossing_ms" },
+            "properties": [{ "id": "displayName", "value": "Transit Time (IR1 <-> IR2)" }, { "id": "unit", "value": "ms" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_speed_mps" },
+            "properties": [{ "id": "displayName", "value": "Estimated Speed" }, { "id": "unit", "value": "velocityms" }, { "id": "decimals", "value": 3 }]
+          }
+        ]
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 22 },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb_structural_health" },
+          "query": "from(bucket: \"structural_health\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"bridge_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last_direction_str\" or r[\"_field\"] == \"last_crossing_ms\" or r[\"_field\"] == \"last_speed_mps\")\n  |> last()\n  |> keep(columns: [\"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "9. Crossing Direction, Transit Time & Speed",
+      "type": "stat"
+    }
+  ],
+  "refresh": "2s",
+  "schemaVersion": 39,
+  "tags": ["iot", "structural-health", "pes-university", "esp32"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Structural Health IoT Analytics — Bridge Prototype Monitor",
+  "uid": "structural-health-iot-main",
+  "version": 1,
+  "weekStart": ""
+}

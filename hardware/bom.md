@@ -1,44 +1,39 @@
-# Hardware Bill of Materials
+# Hardware Bill of Materials (BOM) — As-Built Prototype
 
-## Existing components
+## Active Sensing & Embedded Electronics
 
-- 1 × ESP32 DevKit (available)
-- 1 × MPU6050 / GY-521 IMU module (available)
-- 1–2 × toy cars (at least one available)
+| Qty | Component | Role in Prototype | Status |
+|---:|---|---|---|
+| 1 | **ESP32 DevKit V1** | Microcontroller, I²C master, GPIO interrupt/polling, Wi-Fi + MQTT publisher | Integrated & tested |
+| 1 | **GY-521 IMU Module (labelled MPU6050)** | 3-axis accelerometer + 3-axis gyroscope for deck vibration (~100 Hz; returns `WHO_AM_I` `0x68` or `0x70`) | Integrated & tested |
+| 1 | **Sharvi 1 kg 4-Wire Bar Load Cell** | Strain-gauge full bridge mounted at one bridge support to measure support reaction | Integrated & tested |
+| 1 | **HX711 Load-Cell Amplifier / 24-bit ADC** | Amplifies and digitizes the millivolt bridge output from the Sharvi 1 kg load cell | Integrated & tested |
+| 2 | **Digital IR Obstacle Sensor Modules** | Active-LOW digital optical gates (`GPIO 26`, `GPIO 27`) for vehicle detection, counting, and direction | Integrated & tested |
+| 1 | **Breadboard & Jumper Wires** | Common 3.3 V / GND distribution and signal routing | Integrated & tested |
 
-## Required sensing/electronics components
+> **Dropped Hardware Note:** The **VL53L0X Time-of-Flight (ToF)** distance sensor originally considered during early planning has been officially dropped from the prototype. There is no direct displacement (`deflection_mm`) sensor in the final hardware.
 
-- 1 × VL53L0X I²C ToF distance sensor breakout
-- 1 × four-wire bar-type load cell (suggested 1 kg nominal capacity; select based on mechanical design and expected loads)
-- 1 × HX711 load-cell ADC/amplifier module
-- 1 × 940 nm IR LED transmitter
-- 1 × matching 940 nm phototransistor receiver
-- 1 × 220 Ω resistor for IR LED current limiting (verify LED datasheet/current)
-- 1 × 10 kΩ resistor for receiver pull-up (adjust circuit based on receiver topology)
+---
 
-## Mechanical materials
+## Mechanical Bridge Prototype Materials
 
-- 1 × flexible metal ruler/strip for bridge deck (approximately 25–30 cm)
-- 1 × rigid MDF/plywood base (approximately 40 × 15 cm)
-- 2 × support blocks
-- Load-cell mounting bracket and plate compatible with the actual load-cell model
-- ToF mounting bracket
-- Screws, nuts and washers as required
+| Qty | Material | Description |
+|---:|---|---|
+| 1 | **Aluminium Scale / Ruler** | Used as the flexible tabletop bridge deck |
+| 1 | **Wooden Base** | Rigid base supporting the bridge piers and load cell |
+| 2 | **Cast-Iron Support Blocks** | Bridge abutments/supports |
+| 1 | **Small Toy Car** | Test vehicle passed across the deck during dynamic crossing trials |
+| — | **Reference Masses** | Known masses (e.g., 50 g, 100 g, 200 g) for load-cell calibration and static-load trials |
 
-## Reusable accessories (verify before purchase)
+---
 
-- Breadboard
-- Male-to-male and male-to-female jumper wires
-- USB data cable suitable for the ESP32
-- Multimeter
-- Known/calibrated masses or a kitchen scale for checking reference loads
+## Electrical & Mechanical Notes
 
-## Purchasing and safety notes
-
-- Confirm the load cell is a **single four-wire full-bridge bar load cell** and confirm its mounting drawing. Do not assume wire colours without seller documentation.
-- The HX711 is an interface/ADC, not a separate sensing modality.
-- Confirm the VL53L0X breakout supports 3.3 V I²C operation.
-- Use a phototransistor receiver rather than a demodulating remote-control receiver module.
-- The load cell measures the reaction at one support, not the entire bridge load.
-- Mechanical stops should prevent overload or permanent bending of the deck/load cell.
-- Recheck ESP32 GPIO logic levels; do not feed 5 V logic directly into a GPIO.
+- **Load-Cell Wiring to HX711:**
+  - **Red** → `E+` (Excitation +)
+  - **Black** → `E-` (Excitation −)
+  - **Green** → `A+` (Signal +)
+  - **White** → `A-` (Signal −)
+  - `B+` and `B-` on the HX711 are unused.
+- **3.3 V Logic Safety:** Power the GY-521 IMU, HX711, and both IR obstacle modules from the ESP32 `3V3` rail with a common `GND` so that no 5 V logic level is ever applied to an ESP32 GPIO pin.
+- **Physical Interpretation of Load Cell:** Because the bar load cell supports one end of the aluminium deck, its output measures the **support reaction at the instrumented support**, not the total load placed on the bridge.

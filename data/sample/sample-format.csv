@@ -1,4 +1,7 @@
-timestamp,run_id,condition,vibration_rms_g,deflection_mm,support_reaction_g,vehicle_count,applied_mass_g
-2026-01-01T10:00:00Z,SAMPLE_01,baseline,0.012,0.00,0.0,0,0
-2026-01-01T10:00:15Z,SAMPLE_01,static_load,0.019,0.42,48.0,0,100
-2026-01-01T10:00:30Z,SAMPLE_01,vehicle_crossing,0.075,0.31,22.0,1,0
+timestamp,run_id,condition,data_source,device_id,seq,uptime_ms,imu_who_am_i,vibration_rms_g,vibration_peak_g,ax_g,ay_g,az_g,gx_dps,gy_dps,gz_dps,hx711_raw_counts,hx711_net_counts,hx711_filtered_counts,hx711_calibrated,calibration_factor,load_grams,ir1_state,ir2_state,ir1_events,ir2_events,vehicle_count,last_direction,last_crossing_ms,last_speed_mps,applied_mass_g,load_position,notes
+2026-11-01T10:00:00+00:00,SYNTH_RUN_01,baseline,synthetic,esp32-bridge-synthetic,1,1000,112,0.01176,0.02935,0.008,-0.0002,0.9882,-0.115,-0.041,0.002,-381709,0,-8.53,False,0.0,,1,1,0,0,0,none,0,,0.0,unloaded,[SYNTHETIC DEMO DATA] Synthetic unloaded baseline trial 1
+2026-11-01T10:00:01+00:00,SYNTH_RUN_01,baseline,synthetic,esp32-bridge-synthetic,2,2000,112,0.0132,0.03873,0.0053,0.0005,1.0003,-0.049,-0.005,-0.075,-381679,30,29.5,False,0.0,,1,1,0,0,0,none,0,,0.0,unloaded,[SYNTHETIC DEMO DATA] Synthetic unloaded baseline trial 1
+2026-11-01T10:20:00+00:00,SYNTH_RUN_05,static_load,synthetic,esp32-bridge-synthetic,81,81000,112,0.01076,0.03007,0.0106,-0.004,0.9863,0.078,0.089,0.209,-374982,6727,6727.97,False,0.0,,1,1,0,0,0,none,0,,50.0,mid-span,[SYNTHETIC DEMO DATA] Synthetic 50g static load mid-span
+2026-11-01T10:20:01+00:00,SYNTH_RUN_05,static_load,synthetic,esp32-bridge-synthetic,82,82000,112,0.01046,0.02882,0.0097,-0.0041,1.0047,0.298,-0.114,-0.137,-375110,6599,6604.43,False,0.0,,1,1,0,0,0,none,0,,50.0,mid-span,[SYNTHETIC DEMO DATA] Synthetic 50g static load mid-span
+2026-11-01T10:40:01+00:00,SYNTH_RUN_09,vehicle_crossing,synthetic,esp32-bridge-synthetic,162,162000,112,0.05599,0.18644,0.052,-0.0023,1.0018,2.819,-0.709,0.189,-377113,4596,4586.2,False,0.0,,0,1,1,0,0,none,0,,0.0,1_to_2,[SYNTHETIC DEMO DATA] Synthetic toy car crossing 1->2 trial 1
+2026-11-01T10:40:02+00:00,SYNTH_RUN_09,vehicle_crossing,synthetic,esp32-bridge-synthetic,163,163000,112,0.07632,0.21382,0.0909,-0.0594,1.0063,1.762,-2.014,0.561,-376564,5145,5110.79,False,0.0,,1,0,1,1,1,1_to_2,563,,0.0,1_to_2,[SYNTHETIC DEMO DATA] Synthetic toy car crossing 1->2 trial 1

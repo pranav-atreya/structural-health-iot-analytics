@@ -1,0 +1,100 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: sh_mosquitto
+    restart: unless-stopped
+    ports:
+      - "${MQTT_BROKER_PORT:-1883}:1883"
+    environment:
+      MQTT_USERNAME: ${MQTT_USERNAME:-bridge_iot}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-bridge_iot_pass}
+      MQTT_ALLOW_ANONYMOUS: ${MQTT_ALLOW_ANONYMOUS:-false}
+    volumes:
+      - ./docker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./docker/mosquitto/entrypoint.sh:/mosquitto-entrypoint.sh:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+      - "tr -d '\\r' < /mosquitto-entrypoint.sh > /tmp/run_mosquitto.sh && chmod +x /tmp/run_mosquitto.sh && exec /bin/sh /tmp/run_mosquitto.sh"
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -p 1883 -u \"$${MQTT_USERNAME:-bridge_iot}\" -P \"$${MQTT_PASSWORD:-bridge_iot_pass}\" -t '$$SYS/broker/uptime' -C 1 -W 3 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: sh_influxdb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${INFLUXDB_PORT:-8086}:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_USERNAME:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD:-bridge_influx_admin_2026}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-pes-iot}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-structural_health}
+      DOCKER_INFLUXDB_INIT_RETENTION: ${INFLUXDB_RETENTION:-30d}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-structural-health-iot-local-dev-token-2026}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mqtt_ingestor:
+    build:
+      context: .
+      dockerfile: backend/mqtt_ingestor/Dockerfile
+    container_name: sh_mqtt_ingestor
+    restart: unless-stopped
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    environment:
+      MQTT_BROKER_HOST: mosquitto
+      MQTT_BROKER_PORT: 1883
+      MQTT_USERNAME: ${MQTT_USERNAME:-bridge_iot}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-bridge_iot_pass}
+      MQTT_TOPIC: ${MQTT_TOPIC:-structural-health/+/telemetry}
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-pes-iot}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-structural_health}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-structural-health-iot-local-dev-token-2026}
+      LOG_LEVEL: INFO
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: sh_grafana
+    restart: unless-stopped
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-bridge_grafana_admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/structural-health-dashboard.json
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-pes-iot}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-structural_health}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-structural-health-iot-local-dev-token-2026}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:

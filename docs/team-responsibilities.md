@@ -1,38 +1,48 @@
-# Equal Four-Way Project Responsibility Allocation
+# Team Responsibility Allocation (`docs/team-responsibilities.md`)
 
-**Project:** IoT-Analytics for Structural Vibration, Deformation and Load Behaviour Monitoring
+**Project:** Structural Health IoT Analytics  
+**Course:** Internet of Things (UE24CS342AA3) — PES University
 
-The complete project is allocated equally among the four team members. Each member is assigned **25% of the overall project scope**. The allocation spans all five IoT stages—Sense, Ingest, Process, Store and Analyze—plus validation and documentation. It is not a hardware-versus-software division.
+## Team Members
 
-## Project-wide allocation matrix
+- **Pranav Shashikiran Atreya** — `PES2UG24CS912`
+- **Yash Raghavendra A** — `PES2UG24CS913`
+- **Hemaksh Breja** — `PES2UG24CS191`
+- **Kashyap V P** — `PES2UG24CS218`
 
-| IoT stage / activity | Pranav Shashikiran Atreya (PES2UG24CS912) | Yash Raghavendra A (PES2UG24CS913) | Hemaksh Breja (PES2UG24CS191) | Kashyap V P (PES2UG24CS218) |
+---
+
+## 1. Practical Working Arrangement
+
+To execute hardware integration and software development efficiently in parallel, the team coordinated around the following practical working arrangement:
+
+- **Pranav Shashikiran Atreya (`PES2UG24CS912`) & Yash Raghavendra A (`PES2UG24CS913`):** Physical tabletop bridge assembly, mechanical mounting of the aluminium scale deck, Sharvi 1 kg load cell, GY-521 IMU, and dual IR obstacle modules, and physical sensor placement.
+- **Pranav Shashikiran Atreya (`PES2UG24CS912`):** ESP32 firmware setup (`structural_health_monitor.ino`), register-level IMU driver (`0x68`/`0x70` compatibility), HX711 & IR state-machine integration, and hardware-to-software MQTT integration.
+- **Hemaksh Breja (`PES2UG24CS191`) & Kashyap V P (`PES2UG24CS218`):** Backend Docker stack (`Mosquitto`, `InfluxDB 2.x`, `Grafana` dashboard provisioning), Python MQTT ingestion & validation service, trial recording/export CLI scripts, and Pandas/Scikit-learn analytics and Decision Tree ML pipeline.
+
+---
+
+## 2. Equal Four-Way Lifecycle Responsibility Matrix (25% Each)
+
+Across the five required course IoT stages (**Sense → Ingest → Process → Store → Analyze**) plus validation and documentation, responsibilities are distributed equally (25% per member):
+
+| IoT Stage / Activity | Pranav Shashikiran Atreya (`PES2UG24CS912`) | Yash Raghavendra A (`PES2UG24CS913`) | Hemaksh Breja (`PES2UG24CS191`) | Kashyap V P (`PES2UG24CS218`) |
 |---|---|---|---|---|
-| **Sense** | Define vibration measurement requirements; characterize MPU6050 readings and sampling | Define structural measurement setup; plan load and deflection measurements and sensor placement | Define vehicle-crossing event criteria and IR count validation procedure | Define measurement variables, trial labels and data-capture requirements |
-| **Ingest** | Define ESP32 acquisition sequence, timestamping and sensor data packet | Define repeatable test-run procedure, event timing and experimental run identifiers | Configure MQTT publishing/receiving and cloud-ingestion workflow | Validate incoming data structure, timestamps and dataset consistency |
-| **Process** | Process acceleration readings; calculate vibration RMS and peak | Calibrate load-cell readings and convert ToF baseline change to deflection | Decode MQTT payloads, map channel fields and check missing/invalid updates | Clean data, prepare features and organize experimental labels |
-| **Store** | Define measurement units, field names and calibration metadata | Maintain experimental metadata including applied mass, placement and test condition | Configure ThingSpeak fields and cloud time-series storage | Organize exported datasets and maintain separation of sample and experimental data |
-| **Analyze** | Analyze vibration trends and compare response across test conditions | Analyze load-versus-deflection and support-reaction behaviour | Analyze vehicle-count/time trends and relate crossings to structural measurements | Produce analytical visualizations and implement/evaluate the simple ML classifier |
-| **Validate & document** | Validate vibration measurements and document acquisition methodology | Conduct repeatable physical trials and document mechanical setup and calibration | Verify end-to-end MQTT/cloud receipt and document communication workflow | Validate analytical outputs, report model evaluation and document findings/limitations |
+| **Sense** | Register-level IMU (`0x68`/`0x70`) acquisition at ~100 Hz; ESP32 pin mapping & electrical integration | Mechanical bridge deck setup, Sharvi 1 kg load-cell support mounting, and IR gate alignment | IR obstacle sensor debounce criteria, directional crossing state-machine specification | Sensor measurement variables, trial condition definitions (`baseline`, `static_load`, `vehicle_crossing`) |
+| **Ingest** | ESP32 non-blocking Serial CSV (10 Hz) & Wi-Fi/MQTT JSON (1 Hz) telemetry framing | Repeatable physical trial protocol, known-mass tare/calibration workflow, and run numbering | Eclipse Mosquitto broker setup, topic design (`structural-health/+/telemetry`), and Python MQTT subscriber | Telemetry JSON schema validation, non-finite value rejection, and timestamp alignment |
+| **Process** | On-device gravity low-pass filtering, windowed `vibration_rms_g` and `vibration_peak_g`, and HX711 EMA filtering | Load-cell tare offset and known-mass calibration factor (`counts/g`) characterization at the instrumented support | Backend payload normalization, tag extraction (`device_id`, `imu_chip`, `calibrated`), and error handling | Dataset cleaning, per-run feature engineering (`accel_dynamic_g`, `gyro_magnitude_dps`, `ir_event_rate`) |
+| **Store** | Define firmware telemetry keys, units, and calibration metadata flags (`hx711_calibrated`) | Maintain experimental trial metadata (`applied_mass_g`, `load_position`, `notes`) | Configure InfluxDB 2.x bucket (`structural_health`), measurement (`bridge_telemetry`), and Docker persistence | Manage CSV trial recording (`record_trial.py`), InfluxDB export (`export_data.py`), and `synthetic` vs `experimental` separation |
+| **Analyze** | Correlate deck vibration RMS/peak with static loading and vehicle crossings | Analyze support-reaction counts vs load mass and load placement position | Provision the 10-panel Grafana live dashboard (`structural-health-dashboard.json`) and crossing analytics | Generate comparative Matplotlib plots (`analyze_trials.py`) and implement group-split `DecisionTreeClassifier` (`train_model.py`, `predict.py`) |
+| **Validate & Document** | Verify ESP32 firmware compilation, Serial diagnostics, and hardware-software interface documentation | Document BOM, pin map, and reproducible experimental protocol templates | Verify Docker Compose stack health, Mosquitto auth, and database/dashboard documentation | Run automated `pytest` suite, validate ML statistical readiness checks, and maintain viva/analytics docs |
 
-## Equal allocation summary
+---
 
-| Team member | Allocated share |
-|---|---:|
-| Pranav Shashikiran Atreya | 25% |
-| Yash Raghavendra A | 25% |
-| Hemaksh Breja | 25% |
-| Kashyap V P | 25% |
-| **Total** | **100%** |
+## 3. Equal Allocation Summary
 
-Each allocation spans the full project lifecycle. Team members should understand the common architecture and be prepared to explain their assigned activities during the review.
-
-## Common project deliverables
-
-All members coordinate on:
-- The shared Sense → Ingest → Process → Store → Analyze pipeline.
-- One agreed sensor-data schema and experiment protocol.
-- Verification using actual prototype measurements.
-- Final results, limitations and project documentation.
-
-Synthetic/sample data may be used for development and testing, but must be clearly identified and must not be presented as physical experimental results.
+| Team Member | SRN | Allocated Share |
+|---|---|---:|
+| Pranav Shashikiran Atreya | `PES2UG24CS912` | 25% |
+| Yash Raghavendra A | `PES2UG24CS913` | 25% |
+| Hemaksh Breja | `PES2UG24CS191` | 25% |
+| Kashyap V P | `PES2UG24CS218` | 25% |
+| **Total** | | **100%** |

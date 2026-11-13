@@ -1,0 +1,123 @@
+{
+  "status": "SUCCESS",
+  "statistically_meaningful": true,
+  "is_synthetic_demonstration": true,
+  "scope_statement": "Classifies tabletop prototype operating conditions (baseline, static_load, vehicle_crossing). Does NOT predict bridge failure or real-world structural safety.",
+  "data_path": "data\\sample\\synthetic_trials.csv",
+  "data_sources": [
+    "synthetic"
+  ],
+  "random_seed": 42,
+  "feature_columns": [
+    "vibration_rms_g",
+    "vibration_peak_g",
+    "accel_dynamic_g",
+    "gyro_magnitude_dps",
+    "hx711_filtered_counts",
+    "ir_blocked_sensors",
+    "ir_event_rate",
+    "vehicle_crossing_delta"
+  ],
+  "classes": [
+    "baseline",
+    "static_load",
+    "vehicle_crossing"
+  ],
+  "train_runs": [
+    "SYNTH_RUN_01",
+    "SYNTH_RUN_02",
+    "SYNTH_RUN_03",
+    "SYNTH_RUN_05",
+    "SYNTH_RUN_06",
+    "SYNTH_RUN_07",
+    "SYNTH_RUN_10",
+    "SYNTH_RUN_11",
+    "SYNTH_RUN_12"
+  ],
+  "test_runs": [
+    "SYNTH_RUN_04",
+    "SYNTH_RUN_08",
+    "SYNTH_RUN_09"
+  ],
+  "train_samples": 180,
+  "test_samples": 60,
+  "metrics": {
+    "accuracy": 1.0,
+    "macro_precision": 1.0,
+    "macro_recall": 1.0,
+    "macro_f1": 1.0
+  },
+  "confusion_matrix": {
+    "labels": [
+      "baseline",
+      "static_load",
+      "vehicle_crossing"
+    ],
+    "matrix": [
+      [
+        20,
+        0,
+        0
+      ],
+      [
+        0,
+        20,
+        0
+      ],
+      [
+        0,
+        0,
+        20
+      ]
+    ]
+  },
+  "feature_importances": {
+    "vibration_rms_g": 0.5,
+    "vibration_peak_g": 0.0,
+    "accel_dynamic_g": 0.0,
+    "gyro_magnitude_dps": 0.0,
+    "hx711_filtered_counts": 0.5,
+    "ir_blocked_sensors": 0.0,
+    "ir_event_rate": 0.0,
+    "vehicle_crossing_delta": 0.0
+  },
+  "classification_report": {
+    "baseline": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 20.0
+    },
+    "static_load": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 20.0
+    },
+    "vehicle_crossing": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 20.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 60.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 60.0
+    }
+  },
+  "decision_tree_rules": "|--- vibration_rms_g <= 0.02\n|   |--- hx711_filtered_counts <= 3228.08\n|   |   |--- class: baseline\n|   |--- hx711_filtered_counts >  3228.08\n|   |   |--- class: static_load\n|--- vibration_rms_g >  0.02\n|   |--- class: vehicle_crossing\n",
+  "artifacts": {
+    "model_joblib": "C:\\Users\\Pranav S Atreya\\PES\\sem5\\IOT\\Miniproj\\structural-health-iot-analytics\\analytics-ml\\results\\decision_tree_model.joblib",
+    "confusion_matrix_plot": "C:\\Users\\Pranav S Atreya\\PES\\sem5\\IOT\\Miniproj\\structural-health-iot-analytics\\analytics-ml\\results\\confusion_matrix.png",
+    "feature_importance_plot": "C:\\Users\\Pranav S Atreya\\PES\\sem5\\IOT\\Miniproj\\structural-health-iot-analytics\\analytics-ml\\results\\feature_importance.png"
+  }
+}
